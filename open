@@ -1,0 +1,128 @@
+#! /usr/bin/python3
+
+import mimetypes
+import os
+import shlex
+import subprocess
+import sys
+import tomllib
+from pathlib import Path
+
+DEFAULTS = {
+    "music": "termusic",
+    "wifi": "nmtui",
+    "directory": "yazi",
+    "video": "mpv",
+    "audio": "mpv",
+    "image": "kitty +kitten icat",
+    "text": "nvim",
+    "default": "xdg-open",
+}
+
+CONFIG_PATH = Path.home() / ".config" / "open" / "open.toml"
+
+
+def ensure_config():
+    """Create config file with defaults if it doesn't exist. Return parsed config."""
+    if not CONFIG_PATH.exists():
+        CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
+        lines = []
+        lines.append("# Special keywords")
+        lines.append(f'music = "{DEFAULTS["music"]}"')
+        lines.append(f'wifi = "{DEFAULTS["wifi"]}"')
+        lines.append("")
+        lines.append("# Directory handler")
+        lines.append(f'directory = "{DEFAULTS["directory"]}"')
+        lines.append("")
+        lines.append("# MIME-type handlers")
+        lines.append(f'video = "{DEFAULTS["video"]}"')
+        lines.append(f'audio = "{DEFAULTS["audio"]}"')
+        lines.append(f'image = "{DEFAULTS["image"]}"')
+        lines.append(f'text = "{DEFAULTS["text"]}"')
+        lines.append("")
+        lines.append("# Fallback for unknown file types")
+        lines.append(f'default = "{DEFAULTS["default"]}"')
+        lines.append("")
+        CONFIG_PATH.write_text("\n".join(lines))
+
+    with open(CONFIG_PATH, "rb") as f:
+        return tomllib.load(f)
+
+
+def get_handler(config, key):
+    """Get handler string from config, falling back to DEFAULTS."""
+    return config.get(key) or DEFAULTS.get(key, "xdg-open")
+
+
+def get_mime_type(path):
+    mime, _ = mimetypes.guess_type(path)
+    return mime or ""
+
+
+def launch(handler, target=None):
+    """Split handler string and run it, optionally appending the target path."""
+    parts = shlex.split(handler)
+    if target:
+        parts.append(target)
+    subprocess.run(parts)
+
+
+def main():
+    if len(sys.argv) < 2 or sys.argv[1] in ("-h", "--help"):
+        print(f"Usage: {sys.argv[0]} <music|wifi|directory|file>")
+        print()
+        print("Smart file opener that dispatches to different programs based on type.")
+        print()
+        print("Special keywords:")
+        print("  music    Open music player")
+        print("  wifi     Open WiFi manager")
+        print()
+        print("Arguments:")
+        print("  <path>   Directory  — open in file manager")
+        print("           Video file — open in video player")
+        print("           Audio file — open in audio player")
+        print("           Image file — open in image viewer")
+        print("           Other file — open with default handler")
+        print()
+        print(f"Config: {CONFIG_PATH}")
+        sys.exit(0)
+
+    target = sys.argv[1]
+    config = ensure_config()
+
+    # Special keywords
+    if target == "music":
+        launch(get_handler(config, "music"))
+        return
+
+    if target == "wifi":
+        launch(get_handler(config, "wifi"))
+        return
+
+    # Directory
+    if os.path.isdir(target):
+        launch(get_handler(config, "directory"), target)
+        return
+
+    # File
+    if os.path.isfile(target):
+        mime = get_mime_type(target)
+
+        if mime.startswith("video/"):
+            launch(get_handler(config, "video"), target)
+        elif mime.startswith("audio/"):
+            launch(get_handler(config, "audio"), target)
+        elif mime.startswith("image/"):
+            launch(get_handler(config, "image"), target)
+        elif mime.startswith("text/"):
+            launch(get_handler(config, "text"), target)
+        else:
+            launch(get_handler(config, "default"), target)
+        return
+
+    print(f"Error: '{target}' is not a valid file, directory, or keyword.")
+    sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
