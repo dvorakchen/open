@@ -11,6 +11,9 @@ from pathlib import Path
 DEFAULTS = {
     "music": "termusic",
     "wifi": "nmtui",
+    "mail": "aerc",
+    "im": "iamb",
+    "clipboard": "cliphist list | fzf | cliphist decode | copy",
     "directory": "yazi",
     "video": "mpv",
     "audio": "mpv",
@@ -30,6 +33,9 @@ def ensure_config():
         lines.append("# Special keywords")
         lines.append(f'music = "{DEFAULTS["music"]}"')
         lines.append(f'wifi = "{DEFAULTS["wifi"]}"')
+        lines.append(f'mail = "{DEFAULTS["mail"]}"')
+        lines.append(f'im = "{DEFAULTS["im"]}"')
+        lines.append(f'clipboard = "{DEFAULTS["clipboard"]}"')
         lines.append("")
         lines.append("# Directory handler")
         lines.append(f'directory = "{DEFAULTS["directory"]}"')
@@ -61,6 +67,10 @@ def get_mime_type(path):
 
 def launch(handler, target=None):
     """Split handler string and run it, optionally appending the target path."""
+    if "|" in handler:
+        # Pipeline command — run through the shell
+        subprocess.run(handler, shell=True)
+        return
     parts = shlex.split(handler)
     if target:
         parts.append(target)
@@ -69,13 +79,16 @@ def launch(handler, target=None):
 
 def main():
     if len(sys.argv) < 2 or sys.argv[1] in ("-h", "--help"):
-        print(f"Usage: {sys.argv[0]} <music|wifi|directory|file>")
+        print(f"Usage: {sys.argv[0]} <music|wifi|mail|im|directory|file>")
         print()
         print("Smart file opener that dispatches to different programs based on type.")
         print()
         print("Special keywords:")
         print("  music    Open music player")
         print("  wifi     Open WiFi manager")
+        print("  mail     Open email client (aerc)")
+        print("  im       Open instant messaging (Matrix via iamb)")
+        print("  cb       Open clipboard manager")
         print()
         print("Arguments:")
         print("  <path>   Directory  — open in file manager")
@@ -97,6 +110,18 @@ def main():
 
     if target == "wifi":
         launch(get_handler(config, "wifi"))
+        return
+
+    if target == "mail":
+        launch(get_handler(config, "mail"))
+        return
+
+    if target == "im":
+        launch(get_handler(config, "im"))
+        return
+
+    if target == "cb":
+        launch(get_handler(config, "clipboard"))
         return
 
     # Directory
