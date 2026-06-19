@@ -13,7 +13,7 @@ DEFAULTS = {
     "wifi": "nmtui",
     "mail": "aerc",
     "im": "iamb",
-    "clipboard": "cliphist list | fzf | cliphist decode | copy",
+    "clipboard": "cliphist list | fzf | cliphist decode | wl-copy",
     "directory": "yazi",
     "video": "mpv",
     "audio": "mpv",
