@@ -5,7 +5,7 @@ Smart file opener — dispatches files and directories to different programs bas
 ## Features
 
 - **Type-aware dispatching**: Opens video, audio, image, and text files each with their own configured program.
-- **Special keywords**: `music`, `wifi`, `mail`, `im`, `cb` — launch apps or run pipelines with a single word.
+- **Special keywords**: `music`, `wifi`, `mail`, `im`, `cb`, `db`, `postman` — launch apps or run pipelines with a single word.
 - **Configurable**: Edit `~/.config/open/open.toml` to set your preferred programs for each type.
 - **Sensible defaults**: Works out of the box with common terminal tools (termusic, mpv, nvim, yazi, etc.).
 
@@ -24,7 +24,7 @@ Requires Python 3.11+ (for `tomllib`).
 ## Usage
 
 ```bash
-open <music|wifi|mail|im|cb|path>
+open <music|wifi|mail|im|cb|db|postman|path>
 ```
 
 ### Special keywords
@@ -36,6 +36,8 @@ open <music|wifi|mail|im|cb|path>
 | `mail`  | Email client          | `aerc`                                     |
 | `im`    | Instant messaging     | `iamb` (Matrix client)                     |
 | `cb`    | Clipboard manager     | `cliphist list \| fzf \| cliphist decode \| copy` |
+| `db`    | Database client       | `gobang`                                    |
+| `postman` | API client          | `atac`                                      |
 
 ### File types
 
@@ -61,6 +63,8 @@ wifi = "iwgtk"
 mail = "mutt"
 im = "weechat"
 clipboard = "cliphist list | fzf | cliphist decode | wl-copy"
+db = "gobang"
+postman = "atac"
 
 # Directory handler
 directory = "lf"
@@ -89,6 +93,8 @@ open wifi                   # Opens nmtui
 open mail                   # Opens aerc
 open im                     # Opens iamb (Matrix)
 open cb                     # Opens clipboard manager (fzf pick → decode → copy)
+open db                     # Opens gobang (database client)
+open postman                # Opens atac (API client)
 ```
 
 ## Dependencies
@@ -98,6 +104,7 @@ open cb                     # Opens clipboard manager (fzf pick → decode → c
 | Python 3.11+ (for `tomllib`)              | Runtime                         |
 | `termusic` / `mpv` / `nvim` / `yazi`      | Default handlers (configurable)   |
 | `aerc` / `iamb` / `cliphist` / `nmtui`    | Default keyword handlers         |
+| `gobang` / `atac`                          | Default keyword handlers         |
 
 ## License
 

@@ -14,6 +14,8 @@ DEFAULTS = {
     "mail": "aerc",
     "im": "iamb",
     "clipboard": "cliphist list | fzf | cliphist decode | wl-copy",
+    "db": "gobang",
+    "postman": "atac",
     "directory": "yazi",
     "video": "mpv",
     "audio": "mpv",
@@ -36,6 +38,8 @@ def ensure_config():
         lines.append(f'mail = "{DEFAULTS["mail"]}"')
         lines.append(f'im = "{DEFAULTS["im"]}"')
         lines.append(f'clipboard = "{DEFAULTS["clipboard"]}"')
+        lines.append(f'db = "{DEFAULTS["db"]}"')
+        lines.append(f'postman = "{DEFAULTS["postman"]}"')
         lines.append("")
         lines.append("# Directory handler")
         lines.append(f'directory = "{DEFAULTS["directory"]}"')
@@ -61,8 +65,15 @@ def get_handler(config, key):
 
 
 def get_mime_type(path):
-    mime, _ = mimetypes.guess_type(path)
-    return mime or ""
+    try:
+        result = subprocess.run(
+            ["mimetype", "-b", path],
+            capture_output=True, text=True
+        )
+        return result.stdout.strip()
+    except FileNotFoundError:
+        mime, _ = mimetypes.guess_type(path)
+        return mime or ""
 
 
 def launch(handler, target=None):
@@ -89,6 +100,8 @@ def main():
         print("  mail     Open email client (aerc)")
         print("  im       Open instant messaging (Matrix via iamb)")
         print("  cb       Open clipboard manager")
+        print("  db       Open database client (gobang)")
+        print("  postman  Open API client (atac)")
         print()
         print("Arguments:")
         print("  <path>   Directory  — open in file manager")
@@ -122,6 +135,14 @@ def main():
 
     if target == "cb":
         launch(get_handler(config, "clipboard"))
+        return
+
+    if target == "db":
+        launch(get_handler(config, "db"))
+        return
+
+    if target == "postman":
+        launch(get_handler(config, "postman"))
         return
 
     # Directory
