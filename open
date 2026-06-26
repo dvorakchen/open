@@ -105,6 +105,7 @@ def main():
         print()
         print("Arguments:")
         print("  <path>   Directory  — open in file manager")
+        print("           GIF file   — open in mpv")
         print("           Video file — open in video player")
         print("           Audio file — open in audio player")
         print("           Image file — open in image viewer")
@@ -158,6 +159,8 @@ def main():
             launch(get_handler(config, "video"), target)
         elif mime.startswith("audio/"):
             launch(get_handler(config, "audio"), target)
+        elif mime == "image/gif":
+            subprocess.run(["mpv", target])
         elif mime.startswith("image/"):
             launch(get_handler(config, "image"), target)
         elif mime.startswith("text/"):

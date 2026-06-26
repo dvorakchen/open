@@ -42,6 +42,7 @@ open <music|wifi|mail|im|cb|db|postman|path>
 ### File types
 
 | Type      | Handler              |
+| GIF        | `mpv`                 |
 | --------- | -------------------- |
 | Directory | `yazi`               |
 | Video     | `mpv`                |
@@ -102,7 +103,7 @@ open postman                # Opens atac (API client)
 | Program                                   | Used for                        |
 | ----------------------------------------- | ------------------------------- |
 | Python 3.11+ (for `tomllib`)              | Runtime                         |
-| `termusic` / `mpv` / `nvim` / `yazi`      | Default handlers (configurable)   |
+| `termusic` / `mpv` / `nvim` / `yazi` / `kitty` | Default handlers (configurable)   |
 | `aerc` / `iamb` / `cliphist` / `nmtui`    | Default keyword handlers         |
 | `gobang` / `atac`                          | Default keyword handlers         |
 
